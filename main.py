@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from database import TodoItem
 
@@ -9,11 +9,11 @@ app = FastAPI()
 
 
 class requirements(BaseModel):
-    title: str
-    description: str
-    difficulty: int
-    importance: int
-    completed: bool
+    title: str = Field(max_length=400)
+    description: str = Field(max_length=400)
+    difficulty: int = Field(gt=0, lt=6)
+    importance: int = Field(gt=0, lt=6)
+    completed: bool = False
 
 
 def get_db():
@@ -23,7 +23,8 @@ def get_db():
     finally:
         db.close()
 
-#It works!
+
+# It works!
 
 @app.post("/todo")
 async def create_data(request: requirements, db: Session = Depends(get_db)):
@@ -49,7 +50,7 @@ async def read_data(db: Session = Depends(get_db)):
 
 @app.delete("/todo/{item_id}")
 async def delete_data(item_id: int, db: Session = Depends(get_db)):
-    item_to_delete = db.query(TodoItem).filter(TodoItem.id == item_id).first()#added .first and forot TodoItem.id
+    item_to_delete = db.query(TodoItem).filter(TodoItem.id == item_id).first()  # added .first and forot TodoItem.id
     if item_to_delete:
         db.delete(item_to_delete)
         db.commit()
