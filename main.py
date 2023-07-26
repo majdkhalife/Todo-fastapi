@@ -8,11 +8,13 @@ from database import SessionLocal
 app = FastAPI()
 
 
+# add auto incrementing feature
+
 class requirements(BaseModel):
     title: str = Field(max_length=400)
     description: str = Field(max_length=400)
-    difficulty: int = Field(gt=0, lt=6)
-    importance: int = Field(gt=0, lt=6)
+    difficulty: int = Field(gt=0, lt=6, default=1)
+    importance: int = Field(gt=0, lt=6, default=1)
     completed: bool = False
 
 
@@ -56,18 +58,3 @@ async def delete_data(item_id: int, db: Session = Depends(get_db)):
         db.commit()
         return {"message": "Item was successfully deleted"}
     return {"Error": "Item id does not exist"}
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/todo")
-async def todo():
-    return {"message": "This is a todo website using sqlite3"}
-
-
-@app.get("/hello/{car}")
-async def favorite_car(car: str):
-    return {"message": f"This is my favorite car {car}"}
